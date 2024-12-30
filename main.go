@@ -1,9 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"os"
+	"time"
 
 	btea "github.com/charmbracelet/bubbletea"
+	bf "github.com/mattemello/passwordCracker/bruteForce"
 	tui "github.com/mattemello/passwordCracker/tui"
 )
 
@@ -15,11 +18,15 @@ func main() {
 	}
 
 	if pass, ok := pass.(tui.PasswordModel); ok && pass.PasswordInput.Value() != "" {
-		go testPassword(pass.PasswordInput.Value())
-		p = btea.NewProgram(tui.SpinnerWaitInitialModel())
+		timePassed := make(chan time.Duration)
+		go bf.BruteForcePass(pass.PasswordInput.Value(), timePassed)
+		p = btea.NewProgram(tui.SpinnerWaitInitialModel(timePassed))
+
 		_, err := p.Run()
 		if err != nil {
 			os.Exit(1)
 		}
+
+		fmt.Println(<-timePassed)
 	}
 }

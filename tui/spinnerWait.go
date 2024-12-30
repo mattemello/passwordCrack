@@ -2,6 +2,7 @@ package tui
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/charmbracelet/bubbles/spinner"
 	btea "github.com/charmbracelet/bubbletea"
@@ -13,9 +14,12 @@ type SpinnerWaitModel struct {
 	err         error
 }
 
-func SpinnerWaitInitialModel() SpinnerWaitModel {
+var timePassed = make(chan time.Duration)
+
+func SpinnerWaitInitialModel(timeChannel chan time.Duration) SpinnerWaitModel {
 	s := spinner.New()
 	s.Spinner = spinner.Dot
+	timePassed = timeChannel
 
 	return SpinnerWaitModel{SpinnerWait: s}
 }
